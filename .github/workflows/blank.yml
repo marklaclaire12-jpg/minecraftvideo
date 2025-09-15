@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minecraft Recorder Web</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    .hidden { display: none; }
+    .container { padding: 20px; }
+    input { display: block; margin: 10px 0; padding: 8px; width: 100%; max-width: 300px; }
+    button { padding: 10px 20px; margin-top: 10px; cursor: pointer; }
+    nav { background: #222; color: #fff; padding: 10px; display: flex; gap: 10px; }
+    nav button { background: #555; color: #fff; border: none; }
+    /* Horizontal scroll container for players */
+    .player-scroll { 
+      display: flex; 
+      overflow-x: auto; 
+      padding-bottom: 10px; 
+      gap: 10px;
+    }
+    .player-card { 
+      flex: 0 0 auto; 
+      width: 300px; 
+      border: 1px solid #ccc; 
+      border-radius: 8px; 
+      padding: 10px; 
+      box-sizing: border-box; 
+      background: #f9f9f9;
+    }
+    video { width: 100%; border-radius: 4px; }
+  </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div id="loginScreen" class="container">
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username">
+  <input type="password" id="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="loginError" style="color:red;"></p>
+</div>
+
+<!-- App Screen -->
+<div id="appScreen" class="hidden">
+  <nav>
+    <button onclick="showPage('script')">Script</button>
+    <button onclick="showPage('players')">Live Players</button>
+  </nav>
+
+  <!-- Script Page -->
+  <div id="scriptPage" class="container">
+    <h2>Server Script</h2>
+    <pre>
+/trigger startRecording
+/trigger stopRecording
+    </pre>
+    <p>Copy this into your server plugin/mod. Make sure your players have streaming set up.</p>
+  </div>
+
+  <!-- Live Players Page -->
+  <div id="playersPage" class="container hidden">
+    <h2>Live Players</h2>
+    <div class="player-scroll" id="playersList">
+      <!-- Player cards will appear here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  // Login credentials
+  const USERNAME = "mark";
+  const PASSWORD = "Admin2004@";
+
+  // Login function
+  function login() {
+    const u = document.getElementById("username").value;
+    const p = document.getElementById("password").value;
+    const errorEl = document.getElementById("loginError");
+
+    if(u === USERNAME && p === PASSWORD) {
+      document.getElementById("loginScreen").classList.add("hidden");
+      document.getElementById("appScreen").classList.remove("hidden");
+      loadPlayers();
+    } else {
+      errorEl.textContent = "Incorrect username or password";
+    }
+  }
+
+  // Switch pages
+  function showPage(page) {
+    document.getElementById("scriptPage").classList.add("hidden");
+    document.getElementById("playersPage").classList.add("hidden");
+    if(page === "script") document.getElementById("scriptPage").classList.remove("hidden");
+    if(page === "players") document.getElementById("playersPage").classList.remove("hidden");
+  }
+
+  // Load demo players
+  function loadPlayers() {
+    const players = [
+      {name: "Player1", streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"},
+      {name: "Player2", streamUrl: "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"},
+      {name: "Player3", streamUrl: "https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8"},
+      {name: "Player4", streamUrl: "https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8"}
+    ];
+
+    const listEl = document.getElementById("playersList");
+    listEl.innerHTML = ""; // clear previous content
+
+    players.forEach(player => {
+      const card = document.createElement("div");
+      card.className = "player-card";
+      card.innerHTML = `
+        <h3>${player.name}</h3>
+        <video src="${player.streamUrl}" controls></video>
+        <button onclick="alert('Recording started for ${player.name}')">Record Gameplay</button>
+      `;
+      listEl.appendChild(card);
+    });
+  }
+</script>
+
+</body>
+</html>
